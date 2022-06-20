@@ -46,13 +46,30 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn( name= "role_id"))
     private Collection<Role> roles = new HashSet<>();
 
+    public User() {
+    }
+
+    public User(String name, String surname, int age, String password, Collection<Role> roles) {
+        this.name = name;
+        this.surname = surname;
+        this.age = age;
+        this.password = password;
+        this.roles = roles;
+    }
+
+    public User(String name, String password, Collection<Role> roles) {
+        this.name = name;
+        this.password = password;
+        this.roles = roles;
+    }
+
     public void addRoleToCollection(Role role) {
         roles.add(role);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getName())).collect(Collectors.toList());
+        return roles;
     }
 
     @Override
