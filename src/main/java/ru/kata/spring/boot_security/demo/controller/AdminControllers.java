@@ -11,6 +11,7 @@ import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 
 @Controller
@@ -29,71 +30,56 @@ public class AdminControllers {
     }
 
     @GetMapping()
-    public String adminPage(){return "admin";}
-
-
-    @GetMapping("/{id}")
-    public String userPage(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("user", userService.findUserById(id));
-        return "/user";
-    }
-
-    @GetMapping("/users")
-    public String showAllUsers (Model model) {
-        model.addAttribute("users", userService.getAll());
-        return "/adminPage/users";
-    }
-
-    @GetMapping("/new")
-    public String newUser(@ModelAttribute("user") User user, Model model) {
+    public String adminPage(Model model, Principal principal) {
+        User user = userService.findByName(principal.getName());
         model.addAttribute("roles", roleService.getRoles());
-        return "adminPage/new";
+        model.addAttribute("users", userService.getAll());
+        model.addAttribute("user", user);
+        model.addAttribute("newUser", new User());
+        return "admin";
     }
 
-    @PostMapping("/users")
-    public String create(@ModelAttribute("user")@Valid User user, BindingResult bindingResult,
-                         @ModelAttribute("userRoles") String[] userRoles) {
+    @PostMapping("/new")
+    public String create(@ModelAttribute("newUser")@Valid User user, BindingResult bindingResult,
+                         @ModelAttribute("userRoles") Long [] userRoles) {
 
         if (bindingResult.hasErrors()) {
-            return "/adminPage/new";
+            return "admin";
         }
         if (userRoles != null) {
-            for(String role: userRoles) {
-                user.addRoleToCollection(roleService.findByName(role));
+            for(Long role: userRoles) {
+                user.addRoleToCollection(roleService.findRoleById(role));
             }
+        } else {
+            user.addRoleToCollection(roleService.findRoleById(2L));
         }
-        user.addRoleToCollection(roleService.findByName("ROLE_USER"));
+
         userService.saveUser(user);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") Long id) {
-        model.addAttribute("roles", roleService.getRoles());
-        model.addAttribute("user", userService.findUserById(id));
-        return "/adminPage/edit";
-    }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-                         @PathVariable("id") Long id,
-                         @ModelAttribute("userRoles") String[] userRoles) {
+    public String update(@ModelAttribute("newUser") @Valid User user, BindingResult bindingResult,
+                         @ModelAttribute("userRoles") Long[] userRoles) {
         if (bindingResult.hasErrors()) {
-            return "/adminPage/edit";
+            return "/admin";
         }
         if (userRoles != null) {
-            for(String role: userRoles) {
-                user.addRoleToCollection(roleService.findByName(role));
+            for(Long role: userRoles) {
+                user.addRoleToCollection(roleService.findRoleById(role));
             }
+        }else {
+            user.addRoleToCollection(roleService.findRoleById(2L));
         }
-        user.addRoleToCollection(roleService.findByName("ROLE_USER"));
         userService.saveUser(user);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id")  Long id) {
         userService.deleteUser(id);
-        return "redirect:/admin/users";
+        return "redirect:/admin";
     }
+
 }

@@ -39,12 +39,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers( "/index").permitAll()
-                .antMatchers("/admin/**", "/adminAuth/**").hasRole("ADMIN")
-                .antMatchers("/user").hasAnyRole("USER","ADMIN")
+                .antMatchers( "/login").permitAll()
+                .antMatchers("/admin/**").hasAuthority("ADMIN")
+                .antMatchers("/user").hasAnyAuthority("USER")
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().successHandler(successUserHandler)
+                .formLogin()
+                .successHandler(successUserHandler)
                 .permitAll()
                 .and()
                 .logout()
@@ -67,14 +68,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @PostConstruct
     public void init() {
-    Role roleAdmin = new Role(1L, "ROLE_ADMIN");
-    Role roleUser = new Role(2L, "ROLE_USER");
+    Role roleAdmin = new Role(1L, "ADMIN");
+    Role roleUser = new Role(2L, "USER");
     roleService.addRole(roleAdmin);
     roleService.addRole(roleUser);
 
     User admin = new User();
     admin.setName("admin");
     admin.setSurname("admin");
+    admin.setEmail("admin@admin.com");
     admin.setAge(23);
     admin.setPassword("admin");
     admin.addRoleToCollection(roleAdmin);
@@ -84,6 +86,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     User user = new User();
     user.setName("user");
     user.setSurname("userov");
+    user.setEmail("user@user.com");
     user.setAge(43);
     user.setPassword("user");
     user.addRoleToCollection(roleUser);

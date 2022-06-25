@@ -34,6 +34,10 @@ public class User implements UserDetails {
     @Size(min = 2, max=40, message = "Surname should be between 2 and 40 characters")
     private String surname;
 
+    @Column(name = "email")
+    @NotEmpty(message = "Поле \"E-mail\" обязательно для заполнения")
+    @Size(min=8, message = "Поле \"E-mail\" должно состоять не менее, чем из 8 знаков")
+    private String email;
     @Column(name="age")
     private int age;
 
@@ -49,9 +53,10 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String name, String surname, int age, String password, Collection<Role> roles) {
+    public User(String name, String surname,String email, int age, String password, Collection<Role> roles) {
         this.name = name;
         this.surname = surname;
+        this.email = email;
         this.age = age;
         this.password = password;
         this.roles = roles;
