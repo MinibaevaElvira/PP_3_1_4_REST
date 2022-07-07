@@ -11,7 +11,6 @@ import java.security.Principal;
 
 
 @Controller
-@RequestMapping("/user")
 public class UserControllers {
     private UserService userService;
 
@@ -21,10 +20,17 @@ public class UserControllers {
     }
 
 
-    @GetMapping()
-    public String userPage(Model model, Principal principal) {
+    @GetMapping("/user")
+    public String userPage(Principal principal, Model model) {
         User user = userService.findByName(principal.getName());
-        model.addAttribute("user", user);
+        model.addAttribute("user",user);
         return "user";
+    }
+
+    @GetMapping("/admin")
+    public String adminPage(Principal principal, Model model) {
+        User user = userService.findByName(principal.getName());
+        model.addAttribute("user",user);
+        return "admin";
     }
 }

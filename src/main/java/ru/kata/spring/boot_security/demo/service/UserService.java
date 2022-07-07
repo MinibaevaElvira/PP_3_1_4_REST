@@ -27,7 +27,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
     public User findUserById(Long id) {
-        return userRepository.getById(id);
+        return userRepository.findUserById(id);
     }
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
@@ -44,8 +44,7 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(String.format("User '%s' not found", name));
         }
-        return new User(user.getName(), user.getPassword(),
-                user.getRoles());
+        return user;
     }
 
 }
