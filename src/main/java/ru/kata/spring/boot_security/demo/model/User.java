@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 
 @Data
-@Component
 @Entity
 @Table(name="users")
 public class User implements UserDetails {
